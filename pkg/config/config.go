@@ -16,6 +16,7 @@ type Credential struct {
 	Project        string `yaml:project`
 	Variable       string `yaml:variable`
 	ServiceAccount string `yaml:service_account`
+	ProjectID      string `yaml:project_id`
 }
 
 //LoadConfig loads the config from a file
