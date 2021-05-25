@@ -18,7 +18,7 @@ Currently it will create a new key under a Service Account update the repos vari
 ```yaml
 credentials:
 - type: gitlab
-  project: infratsructure/clusters
+  project_id: 12344
   variable: GOOGLE_CLOUD_CREDENTIALS
   service_account: example-1234@super-awesome-project.google.com
 ```

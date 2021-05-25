@@ -13,7 +13,6 @@ type Config struct {
 
 type Credential struct {
 	Type           string `yaml:type`
-	Project        string `yaml:project`
 	Variable       string `yaml:variable`
 	ServiceAccount string `yaml:service_account`
 	ProjectID      string `yaml:project_id`

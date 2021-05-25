@@ -17,7 +17,7 @@ func TestConfigLoad(t *testing.T) {
 			Credentials: []Credential{
 				Credential{
 					Type:           "test",
-					Project:        "foo/bar",
+					ProjectID:      "1234",
 					Variable:       "TEST_VARIABLE",
 					ServiceAccount: "test@example.com",
 				},
@@ -32,7 +32,7 @@ func TestConfigLoad(t *testing.T) {
 		err = cfg.LoadConfig(path.Join(tmpDir, "config.yaml"))
 		assertions.NoError(err)
 		assertions.Equal(cfg.Credentials[0].Type, "test")
-		assertions.Equal(cfg.Credentials[0].Project, "foo/bar")
+		assertions.Equal(cfg.Credentials[0].ProjectID, "1234")
 		assertions.Equal(cfg.Credentials[0].Variable, "TEST_VARIABLE")
 		assertions.Equal(cfg.Credentials[0].ServiceAccount, "test@example.com")
 	})
