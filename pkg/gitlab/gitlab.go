@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"github.com/Spazzy757/credentials-rotator/pkg/config"
-	"github.com/Spazzy757/credentials-rotator/pkg/helpers"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -22,13 +21,4 @@ func UpdateVariable(
 		opts,
 	)
 	return err
-}
-
-func GetClient() (*gitlab.Client, error) {
-	token := helpers.GetEnv("GITLAB_TOKEN", "")
-	c, err := gitlab.NewClient(token)
-	if err != nil {
-		return &gitlab.Client{}, err
-	}
-	return c, nil
 }

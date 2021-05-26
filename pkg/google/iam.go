@@ -3,6 +3,7 @@ package google
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	iam "cloud.google.com/go/iam/admin/apiv1"
 	adminpb "google.golang.org/genproto/googleapis/iam/admin/v1"
@@ -18,7 +19,7 @@ func CreateKey(
 	formatted := fmt.Sprintf(
 		"projects/%v/serviceAccounts/%v",
 		project,
-		serviceAccount,
+		url.QueryEscape(serviceAccount),
 	)
 	request := &adminpb.CreateServiceAccountKeyRequest{
 		Name: formatted,
