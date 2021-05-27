@@ -12,7 +12,7 @@ import (
 )
 
 func TestUpdateVariable(t *testing.T) {
-	t.Run("Test Varibale Gets Updated", func(t *testing.T) {
+	t.Run("variable gets updated", func(t *testing.T) {
 		assertions := require.New(t)
 		mux, server, client := helpers.SetupGitlabTestServer(t)
 		defer server.Close()
@@ -29,7 +29,7 @@ func TestUpdateVariable(t *testing.T) {
 				}`)
 			},
 		)
-		os.Setenv("GITLAB_TOKEN", "XjZV85VTkeQvqwLEc8gb")
+		os.Setenv("GITLAB_TOKEN", "XXXXXXXXXXXX")
 		creds := config.Credential{
 			ProjectID: "12345",
 			Variable:  "TEST_VARIABLE",
@@ -38,7 +38,7 @@ func TestUpdateVariable(t *testing.T) {
 		err := UpdateVariable(client, &creds, "ABCDBC")
 		assertions.NoError(err)
 	})
-	t.Run("Test Varibale Fails", func(t *testing.T) {
+	t.Run("updating variable fails", func(t *testing.T) {
 		assertions := require.New(t)
 		mux, server, client := helpers.SetupGitlabTestServer(t)
 		defer server.Close()

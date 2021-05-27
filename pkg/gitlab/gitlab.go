@@ -5,6 +5,9 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
+//UpdateVariable takes a string and updates the
+//specified CI/CD variable that is in the
+//cred struct
 func UpdateVariable(
 	client *gitlab.Client,
 	cred *config.Credential,
