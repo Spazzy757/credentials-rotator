@@ -7,6 +7,8 @@ import (
 	"github.com/Spazzy757/credentials-rotator/pkg/google"
 )
 
+//ConfigHandler
+//based on type of cred it will run different scenarios
 func ConfigHandler(cfg *config.Config) error {
 	var err error
 	for _, cred := range cfg.Credentials {
@@ -18,6 +20,8 @@ func ConfigHandler(cfg *config.Config) error {
 	return err
 }
 
+//gitlabHandler
+//handler for the gitlab scenario
 func gitlabHandler(
 	cfg *config.Config,
 	cred *config.Credential,

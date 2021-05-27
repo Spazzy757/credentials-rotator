@@ -14,7 +14,6 @@ import (
 
 	iam "cloud.google.com/go/iam/admin/apiv1"
 	"github.com/Spazzy757/credentials-rotator/pkg/config"
-	"github.com/Spazzy757/credentials-rotator/pkg/helpers"
 	"github.com/Spazzy757/credentials-rotator/pkg/test"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/api/option"
@@ -67,6 +66,7 @@ func mockGRPCServer() *grpc.Server {
 	return serv
 }
 
+//TODO: add some negative scenario tests
 func TestGitlabHandler(t *testing.T) {
 	t.Run("handles gitlab", func(t *testing.T) {
 		assertions := require.New(t)
@@ -92,7 +92,7 @@ func TestGitlabHandler(t *testing.T) {
 		mockIam.Resps = append(mockIam.Resps[:0], expectedResponse)
 
 		os.Setenv("TEST", "true")
-		mux, server, _ := helpers.SetupGitlabTestServer(t)
+		mux, server, _ := test.SetupGitlabTestServer(t)
 		mux.HandleFunc("/api/v4/projects/12345/variables/TEST_VARIABLE",
 			func(w http.ResponseWriter, r *http.Request) {
 				_, err := ioutil.ReadAll(r.Body)

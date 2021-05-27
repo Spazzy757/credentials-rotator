@@ -9,11 +9,11 @@ import (
 
 func TestGetEnv(t *testing.T) {
 	os.Setenv("SET_ENV", "1")
-	t.Run("Test Unset Environment Returns Default", func(t *testing.T) {
+	t.Run("unset environment returns default", func(t *testing.T) {
 		environment := GetEnv("UNSET_ENV", "default")
 		assert.Equal(t, environment, "default")
 	})
-	t.Run("Test Set Environment Returns Default", func(t *testing.T) {
+	t.Run("set environment returns environment", func(t *testing.T) {
 		environment := GetEnv("SET_ENV", "2")
 		assert.Equal(t, environment, "1")
 	})

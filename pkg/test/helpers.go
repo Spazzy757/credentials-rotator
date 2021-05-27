@@ -4,9 +4,13 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
+	"net/http/httptest"
 	"strings"
+	"testing"
 
 	"github.com/golang/protobuf/ptypes"
+	"github.com/xanzy/go-gitlab"
 	adminpb "google.golang.org/genproto/googleapis/iam/admin/v1"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -76,4 +80,21 @@ func (s *MockIamServer) DeleteServiceAccountKey(
 		return nil, s.Err
 	}
 	return s.Resps[0].(*emptypb.Empty), nil
+}
+
+func SetupGitlabTestServer(t *testing.T) (*http.ServeMux, *httptest.Server, *gitlab.Client) {
+	// mux is the HTTP request multiplexer used with the test server.
+	mux := http.NewServeMux()
+
+	// server is a test HTTP server used to provide mock API responses.
+	server := httptest.NewServer(mux)
+
+	// client is the Gitlab client being tested.
+	client, err := gitlab.NewClient("", gitlab.WithBaseURL(server.URL))
+	if err != nil {
+		server.Close()
+		t.Fatalf("Failed to create client: %v", err)
+	}
+
+	return mux, server, client
 }

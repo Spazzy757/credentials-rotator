@@ -7,14 +7,14 @@ import (
 	"testing"
 
 	"github.com/Spazzy757/credentials-rotator/pkg/config"
-	"github.com/Spazzy757/credentials-rotator/pkg/helpers"
+	"github.com/Spazzy757/credentials-rotator/pkg/test"
 	"github.com/stretchr/testify/require"
 )
 
 func TestUpdateVariable(t *testing.T) {
 	t.Run("variable gets updated", func(t *testing.T) {
 		assertions := require.New(t)
-		mux, server, client := helpers.SetupGitlabTestServer(t)
+		mux, server, client := test.SetupGitlabTestServer(t)
 		defer server.Close()
 		mux.HandleFunc("/api/v4/projects/12345/variables/TEST_VARIABLE",
 			func(w http.ResponseWriter, r *http.Request) {
@@ -40,14 +40,14 @@ func TestUpdateVariable(t *testing.T) {
 	})
 	t.Run("updating variable fails", func(t *testing.T) {
 		assertions := require.New(t)
-		mux, server, client := helpers.SetupGitlabTestServer(t)
+		mux, server, client := test.SetupGitlabTestServer(t)
 		defer server.Close()
 		mux.HandleFunc("/api/v4/projects/12345/variables/TEST_VARIABLE",
 			func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusForbidden)
 			},
 		)
-		os.Setenv("GITLAB_TOKEN", "XjZV85VTkeQvqwLEc8gb")
+		os.Setenv("GITLAB_TOKEN", "XXXXXXXXXXXXXX")
 		creds := config.Credential{
 			ProjectID: "12345",
 			Variable:  "TEST_VARIABLE",
