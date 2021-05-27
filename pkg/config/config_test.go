@@ -11,8 +11,9 @@ import (
 )
 
 func TestConfigLoad(t *testing.T) {
-	t.Run("Testing Loading File Returns Configuration", func(t *testing.T) {
+	t.Run("loading file returns configuration", func(t *testing.T) {
 		assertions := require.New(t)
+
 		testConfig := Config{
 			Credentials: []Credential{
 				Credential{
@@ -24,13 +25,17 @@ func TestConfigLoad(t *testing.T) {
 			},
 		}
 		configBytes, err := yaml.Marshal(testConfig)
+
 		assertions.NoError(err)
+
 		tmpDir := os.TempDir()
 		ioutil.WriteFile(path.Join(tmpDir, "config.yaml"), configBytes, 0644)
 		defer os.RemoveAll(path.Join(tmpDir, "config.yaml"))
+
 		cfg := Config{}
 		err = cfg.LoadConfig(path.Join(tmpDir, "config.yaml"))
 		gitlabClientUrl := cfg.GitlabClient.BaseURL()
+
 		assertions.NoError(err)
 		assertions.Equal(cfg.Credentials[0].Type, "test")
 		assertions.Equal(cfg.Credentials[0].ProjectID, "1234")
@@ -38,7 +43,7 @@ func TestConfigLoad(t *testing.T) {
 		assertions.Equal(cfg.Credentials[0].ServiceAccount, "test@example.com")
 		assertions.Equal(gitlabClientUrl.Host, "gitlab.com")
 	})
-	t.Run("Testing Loading File Returns Test Configuration", func(t *testing.T) {
+	t.Run("loading file returns test configuration", func(t *testing.T) {
 		assertions := require.New(t)
 		os.Setenv("GITLAB_TEST_SERVER_URL", "http://example.com")
 		os.Setenv("TEST", "true")
@@ -67,7 +72,7 @@ func TestConfigLoad(t *testing.T) {
 		assertions.Equal(cfg.Credentials[0].ServiceAccount, "test@example.com")
 		assertions.Equal(gitlabClientUrl.Host, "example.com")
 	})
-	t.Run("Testing Loading Invalid File", func(t *testing.T) {
+	t.Run("loading invalid file", func(t *testing.T) {
 		assertions := require.New(t)
 		tmpDir := os.TempDir()
 		configBytes := []byte("`^88(0")
@@ -78,7 +83,7 @@ func TestConfigLoad(t *testing.T) {
 		assertions.Error(err)
 		assertions.Equal(cfg.Credentials, []Credential(nil))
 	})
-	t.Run("Testing Loading Non Existant File", func(t *testing.T) {
+	t.Run("loading non existant file", func(t *testing.T) {
 		assertions := require.New(t)
 		cfg := Config{}
 		err := cfg.LoadConfig("config.yaml")
