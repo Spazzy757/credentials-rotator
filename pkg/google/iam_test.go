@@ -3,15 +3,14 @@ package google
 import (
 	"context"
 	"flag"
-	"fmt"
 	"io"
 	"log"
 	"net"
 	"os"
-	"strings"
 	"testing"
 
 	iam "cloud.google.com/go/iam/admin/apiv1"
+	"github.com/Spazzy757/credentials-rotator/pkg/test"
 	"github.com/golang/protobuf/ptypes"
 	emptypb "github.com/golang/protobuf/ptypes/empty"
 	"github.com/stretchr/testify/require"
@@ -20,83 +19,19 @@ import (
 	status "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	gstatus "google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
 )
 
 var _ = io.EOF
 var _ = ptypes.MarshalAny
 var _ status.Status
 
-//mockIamServer is a mock GRPC server that
-//handles Google IAM calls
-type mockIamServer struct {
-	// Embed for forward compatibility.
-	// Tests will keep working if more methods are added
-	// in the future.
-	adminpb.IAMServer
-
-	reqs []proto.Message
-
-	// If set, all calls return this error.
-	err error
-
-	// responses to return if err == nil
-	resps []proto.Message
-}
-
-func (s *mockIamServer) CreateServiceAccountKey(
-	ctx context.Context,
-	req *adminpb.CreateServiceAccountKeyRequest,
-) (*adminpb.ServiceAccountKey, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	if xg := md["x-goog-api-client"]; len(xg) == 0 || !strings.Contains(xg[0], "gl-go/") {
-		return nil, fmt.Errorf("x-goog-api-client = %v, expected gl-go key", xg)
-	}
-	s.reqs = append(s.reqs, req)
-	if s.err != nil {
-		return nil, s.err
-	}
-	return s.resps[0].(*adminpb.ServiceAccountKey), nil
-}
-
-func (s *mockIamServer) ListServiceAccountKeys(
-	ctx context.Context,
-	req *adminpb.ListServiceAccountKeysRequest,
-) (*adminpb.ListServiceAccountKeysResponse, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	if xg := md["x-goog-api-client"]; len(xg) == 0 || !strings.Contains(xg[0], "gl-go/") {
-		return nil, fmt.Errorf("x-goog-api-client = %v, expected gl-go key", xg)
-	}
-	s.reqs = append(s.reqs, req)
-	if s.err != nil {
-		return nil, s.err
-	}
-	return s.resps[0].(*adminpb.ListServiceAccountKeysResponse), nil
-}
-
-func (s *mockIamServer) DeleteServiceAccountKey(
-	ctx context.Context,
-	req *adminpb.DeleteServiceAccountKeyRequest,
-) (*emptypb.Empty, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	if xg := md["x-goog-api-client"]; len(xg) == 0 || !strings.Contains(xg[0], "gl-go/") {
-		return nil, fmt.Errorf("x-goog-api-client = %v, expected gl-go key", xg)
-	}
-	s.reqs = append(s.reqs, req)
-	if s.err != nil {
-		return nil, s.err
-	}
-	return s.resps[0].(*emptypb.Empty), nil
-}
-
 // clientOpt is the option tests should use to connect to the test server.
 // It is initialized by TestMain.
 var clientOpt option.ClientOption
 
 var (
-	mockIam mockIamServer
+	mockIam test.MockIamServer
 )
 
 //TestMain Setups the mock GRPC Server
@@ -128,9 +63,9 @@ func TestCreateKey(t *testing.T) {
 		project := "project-1"
 		serviceAccount := "test@example.com"
 		expectedResponse := &adminpb.ServiceAccountKey{}
-		mockIam.err = nil
-		mockIam.reqs = nil
-		mockIam.resps = append(mockIam.resps[:0], expectedResponse)
+		mockIam.Err = nil
+		mockIam.Reqs = nil
+		mockIam.Resps = append(mockIam.Resps[:0], expectedResponse)
 
 		client, err := iam.NewIamClient(ctx, clientOpt)
 
@@ -143,7 +78,7 @@ func TestCreateKey(t *testing.T) {
 	})
 	t.Run("create key fails with error", func(t *testing.T) {
 		errCode := codes.PermissionDenied
-		mockIam.err = gstatus.Error(errCode, "test error")
+		mockIam.Err = gstatus.Error(errCode, "test error")
 
 		assertions := require.New(t)
 		ctx := context.Background()
@@ -170,9 +105,9 @@ func TestListKeys(t *testing.T) {
 
 		assertions.NoError(err)
 		expectedResponse := &adminpb.ListServiceAccountKeysResponse{}
-		mockIam.err = nil
-		mockIam.reqs = nil
-		mockIam.resps = append(mockIam.resps[:0], expectedResponse)
+		mockIam.Err = nil
+		mockIam.Reqs = nil
+		mockIam.Resps = append(mockIam.Resps[:0], expectedResponse)
 
 		key, err := ListKeys(ctx, project, serviceAccount, client)
 
@@ -181,7 +116,7 @@ func TestListKeys(t *testing.T) {
 	})
 	t.Run("list keys fails with error", func(t *testing.T) {
 		errCode := codes.PermissionDenied
-		mockIam.err = gstatus.Error(errCode, "test error")
+		mockIam.Err = gstatus.Error(errCode, "test error")
 
 		assertions := require.New(t)
 		ctx := context.Background()
@@ -208,9 +143,9 @@ func TestDeleteKey(t *testing.T) {
 
 		assertions.NoError(err)
 		expectedResponse := &emptypb.Empty{}
-		mockIam.err = nil
-		mockIam.reqs = nil
-		mockIam.resps = append(mockIam.resps[:0], expectedResponse)
+		mockIam.Err = nil
+		mockIam.Reqs = nil
+		mockIam.Resps = append(mockIam.Resps[:0], expectedResponse)
 
 		err = DeleteKey(ctx, project, serviceAccount, key, client)
 
@@ -218,7 +153,7 @@ func TestDeleteKey(t *testing.T) {
 	})
 	t.Run("delete key fails with error", func(t *testing.T) {
 		errCode := codes.PermissionDenied
-		mockIam.err = gstatus.Error(errCode, "test error")
+		mockIam.Err = gstatus.Error(errCode, "test error")
 
 		assertions := require.New(t)
 		ctx := context.Background()
