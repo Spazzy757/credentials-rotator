@@ -29,6 +29,8 @@ var _ = io.EOF
 var _ = ptypes.MarshalAny
 var _ status.Status
 
+//mockIamServer is a mock GRPC server that
+//handles Google IAM calls
 type mockIamServer struct {
 	// Embed for forward compatibility.
 	// Tests will keep working if more methods are added
@@ -97,6 +99,7 @@ var (
 	mockIam mockIamServer
 )
 
+//TestMain Setups the mock GRPC Server
 func TestMain(m *testing.M) {
 	flag.Parse()
 
@@ -118,8 +121,8 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestGetKeys(t *testing.T) {
-	t.Run("Test Get Keys", func(t *testing.T) {
+func TestCreateKey(t *testing.T) {
+	t.Run("create key is successful", func(t *testing.T) {
 		assertions := require.New(t)
 		ctx := context.Background()
 		project := "project-1"
@@ -138,7 +141,7 @@ func TestGetKeys(t *testing.T) {
 		assertions.NoError(err)
 		assertions.Equal(expectedResponse, key)
 	})
-	t.Run("Test Get Keys Returned Error", func(t *testing.T) {
+	t.Run("create key fails with error", func(t *testing.T) {
 		errCode := codes.PermissionDenied
 		mockIam.err = gstatus.Error(errCode, "test error")
 
@@ -157,7 +160,7 @@ func TestGetKeys(t *testing.T) {
 }
 
 func TestListKeys(t *testing.T) {
-	t.Run("Test List Keys", func(t *testing.T) {
+	t.Run("list keys is successful", func(t *testing.T) {
 		assertions := require.New(t)
 		ctx := context.Background()
 		project := "project-1"
@@ -176,7 +179,7 @@ func TestListKeys(t *testing.T) {
 		assertions.NoError(err)
 		assertions.Equal(expectedResponse, key)
 	})
-	t.Run("Test List Keys Returned Error", func(t *testing.T) {
+	t.Run("list keys fails with error", func(t *testing.T) {
 		errCode := codes.PermissionDenied
 		mockIam.err = gstatus.Error(errCode, "test error")
 
@@ -195,7 +198,7 @@ func TestListKeys(t *testing.T) {
 }
 
 func TestDeleteKey(t *testing.T) {
-	t.Run("Test Delete Key", func(t *testing.T) {
+	t.Run("delete key is successful", func(t *testing.T) {
 		assertions := require.New(t)
 		ctx := context.Background()
 		project := "project-1"
@@ -213,7 +216,7 @@ func TestDeleteKey(t *testing.T) {
 
 		assertions.NoError(err)
 	})
-	t.Run("Test Delete Key Returned Error", func(t *testing.T) {
+	t.Run("delete key fails with error", func(t *testing.T) {
 		errCode := codes.PermissionDenied
 		mockIam.err = gstatus.Error(errCode, "test error")
 
