@@ -20,5 +20,20 @@ credentials:
 - type: gitlab
   project_id: 12344
   variable: GOOGLE_CLOUD_CREDENTIALS
+  google_project_id: test-12345
   service_account: example-1234@super-awesome-project.google.com
 ```
+
+## Environment
+
+Currently for Gitlab you need to export a Gitlab Token
+
+```bash
+export GITLAB_TOKEN="XXXXXXXXXXX"
+```
+
+## Roadmap
+
+- [ ] Integrate Github
+- [ ] Integrate Azure
+
